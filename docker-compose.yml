@@ -1,0 +1,141 @@
+###############################################################################
+# Docker Compose maestro — Stack completo de agentes
+#
+# Levantar todo:  docker compose up -d --build
+#
+# Acceso:
+#   Odysseus   → http://localhost:7000    (AI Workspace)
+#   n8n        → http://localhost:5678    (Automatización)
+#   Ollama     → http://localhost:11434   (LLMs locales)
+#   Obsidian   → http://localhost:8085    (Notas vía web)
+#   SearXNG    → http://localhost:8080    (Búsqueda privada)
+#   ChromaDB   → http://localhost:8100    (Vector DB)
+###############################################################################
+
+services:
+
+  # ─────────────────────────────────────────────
+  # ODYSSEUS — AI Workspace self-hosted
+  # (Ollama corre localmente en el host :11434)
+  # ─────────────────────────────────────────────
+  odysseus:
+    build: ./odysseus
+    ports:
+      - "127.0.0.1:7000:7000"
+    volumes:
+      - odysseus-data:/app/data
+      - odysseus-logs:/app/logs
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      - SEARXNG_INSTANCE=http://searxng:8080
+      - CHROMADB_HOST=chromadb
+      - CHROMADB_PORT=8000
+      - DATABASE_URL=sqlite:///./data/app.db
+      - AUTH_ENABLED=true
+      - ODYSSEUS_ADMIN_USER=admin
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      - FASTEMBED_MODEL=sentence-transformers/all-MiniLM-L6-v2
+      - PUID=1000
+      - PGID=1000
+    depends_on:
+      searxng:
+        condition: service_healthy
+      chromadb:
+        condition: service_started
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────────
+  # N8N — Automatización de workflows
+  # ─────────────────────────────────────────────
+  n8n:
+    image: docker.io/n8nio/n8n:latest
+    ports:
+      - "127.0.0.1:5678:5678"
+    volumes:
+      - n8n-data:/home/node/.n8n
+    environment:
+      - N8N_HOST=0.0.0.0
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - WEBHOOK_URL=http://localhost:5678/
+      - GENERIC_TIMEZONE=America/Bogota
+      - TZ=America/Bogota
+      - N8N_SECURE_COOKIE=false
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────────
+  # CHROMADB — Base de datos vectorial
+  # ─────────────────────────────────────────────
+  chromadb:
+    image: docker.io/chromadb/chroma:latest
+    ports:
+      - "127.0.0.1:8100:8000"
+    volumes:
+      - chromadb-data:/chroma/chroma
+    environment:
+      - ANONYMIZED_TELEMETRY=FALSE
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────────
+  # SEARXNG — Motor de búsqueda privado
+  # ─────────────────────────────────────────────
+  searxng:
+    image: docker.io/searxng/searxng:2026.5.31-7159b8aed
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        set -eu
+        if [ ! -s /etc/searxng/settings.yml ] || grep -q 'odysseus-local-searxng-json-2026-05-30\|__SEARXNG_SECRET__' /etc/searxng/settings.yml; then
+          secret="$${SEARXNG_SECRET:-}"
+          if [ -z "$$secret" ]; then
+            secret="$$(python -c 'import secrets; print(secrets.token_urlsafe(48))')"
+          fi
+          sed "s|__SEARXNG_SECRET__|$$secret|g" /tmp/searxng-settings.yml.template > /etc/searxng/settings.yml
+        fi
+        exec /usr/local/searxng/entrypoint.sh
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - searxng-data:/etc/searxng
+      - ./odysseus/config/searxng/settings.yml:/tmp/searxng-settings.yml.template:ro
+    environment:
+      - SEARXNG_BASE_URL=http://localhost:8080/
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+      - DAC_OVERRIDE
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8080/', timeout=5).read(1)\""]
+      interval: 5s
+      timeout: 6s
+      retries: 20
+      start_period: 10s
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────────
+  # NTFY — Notificaciones push
+  # ─────────────────────────────────────────────
+  ntfy:
+    image: docker.io/binwiederhier/ntfy
+    command: serve
+    ports:
+      - "127.0.0.1:8091:80"
+    volumes:
+      - ntfy-cache:/var/cache/ntfy
+    restart: unless-stopped
+
+volumes:
+  odysseus-data:
+  odysseus-logs:
+  n8n-data:
+
+  chromadb-data:
+  searxng-data:
+  ntfy-cache:
