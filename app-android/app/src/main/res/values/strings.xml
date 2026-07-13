@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Escudo Anti-Estafas</string>
+
+    <string name="onboarding_explicacion">Detecta el momento exacto en que llega un código de verificación mientras estás en una llamada — la firma exacta del robo de WhatsApp. Todo el análisis ocurre en tu teléfono; nada del contenido de tus llamadas o mensajes sale de aquí.</string>
+    <string name="onboarding_boton_activar">Activar protección</string>
+    <string name="onboarding_activo">Protección activa</string>
+    <string name="onboarding_permisos_denegados">Sin estos permisos la app no puede protegerte. Actívalos desde Ajustes cuando quieras activar la protección.</string>
+
+    <string name="canal_monitoreo_nombre">Monitoreo de llamadas</string>
+    <string name="notificacion_monitoreo_titulo">Escudo Anti-Estafas está protegiéndote</string>
+
+    <string name="canal_alerta_nombre">Alertas de riesgo de estafa</string>
+    <string name="alerta_titulo">⚠ NO COMPARTAS EL CÓDIGO</string>
+    <string name="alerta_cuerpo">Recibiste un código de verificación mientras estás en una llamada. Ni tu banco ni WhatsApp lo piden por teléfono. Cuelga ahora.</string>
+    <string name="alerta_boton_entendido">Entendido, voy a colgar</string>
+</resources>

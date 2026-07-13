@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Solo aplica al build type "debug" (ver src/debug/AndroidManifest.xml).
+  El build "release" nunca referencia este archivo y mantiene el bloqueo
+  total de tráfico cleartext que Android exige por defecto desde API 28.
+  Aquí se permite HTTP plano únicamente a rangos de IP privados típicos de
+  desarrollo local, para poder apuntar la app a `npm start` en tu propia
+  red mientras pruebas — nunca a un dominio público.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false" />
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">localhost</domain>
+        <domain includeSubdomains="false">10.0.2.2</domain>
+    </domain-config>
+</network-security-config>

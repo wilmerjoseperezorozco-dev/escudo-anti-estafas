@@ -1,122 +1,52 @@
-# 🧠 WPM Digital Infrastructure
+# Escudo Anti-Estafas — cómo correrlo
 
-> Self-hosted AI stack for business intelligence, automation, and productivity — running locally in Barranquilla, Colombia.
+Defensa contra el secuestro de WhatsApp vía ingeniería social + robo de código OTP: el vector que casi le funcionó a un estafador contra una víctima de 54 años en Colombia. Ver contexto completo en `docs/guia-anti-estafas.md`.
 
-## Stack
+## Backend
 
-| Service | Purpose | Port |
-|---------|---------|------|
-| **Odysseus** | AI Workspace (chat, RAG, agents) | `7000` |
-| **n8n** | Workflow automation | `5678` |
-| **Ollama** | Local LLM inference (runs on host) | `11434` |
-| **ChromaDB** | Vector database for embeddings | `8100` |
-| **SearXNG** | Private meta-search engine | `8080` |
-| **ntfy** | Push notifications | `8091` |
-
-## Architecture
-
-```
-┌─────────────────────────────────────────────────────┐
-│                  WPM Infrastructure                  │
-│                                                     │
-│  ┌──────────┐    ┌──────────┐    ┌──────────────┐  │
-│  │ Odysseus │───▶│ ChromaDB │    │    SearXNG   │  │
-│  │ :7000    │    │  :8100   │    │    :8080     │  │
-│  └────┬─────┘    └──────────┘    └──────────────┘  │
-│       │                                  ▲          │
-│       │ queries                          │ search   │
-│       ▼                                  │          │
-│  ┌──────────┐                   ┌────────┴─────┐   │
-│  │  Ollama  │                   │     n8n      │   │
-│  │  :11434  │                   │    :5678     │   │
-│  │ (host)   │                   │ automations  │   │
-│  └──────────┘                   └──────────────┘   │
-│                                                     │
-│  ┌──────────┐                                       │
-│  │   ntfy   │  push notifications                   │
-│  │  :8091   │                                       │
-│  └──────────┘                                       │
-└─────────────────────────────────────────────────────┘
-```
-
-## Quick Start
-
-### Prerequisites
-
-- [Docker](https://docs.docker.com/get-docker/) + Docker Compose
-- [Ollama](https://ollama.com/) installed on the host machine
-- At least 8GB RAM, 20GB disk
-
-### 1. Clone
+Node/Express, desplegado como función serverless en Vercel, con Postgres (Supabase) como base de datos — Row Level Security habilitado, rate limiting vía una función `security definer` en la propia base de datos (no en memoria del proceso, para que funcione correctamente en serverless).
 
 ```bash
-git clone https://github.com/wilmerjoseperezorozco-dev/wpm-digital-infrastructure.git
-cd wpm-digital-infrastructure
+cd backend
+npm install
+export SUPABASE_URL="https://TU_PROYECTO.supabase.co"
+export SUPABASE_ANON_KEY="tu_clave_publicable"
+npm start
+# → http://localhost:3001
 ```
 
-### 2. Configure environment
+Endpoints:
 
-```bash
-cp .env.example .env
-# Edit .env with your values
-```
+| Endpoint | Qué hace |
+|---|---|
+| `POST /reportes` | Reporta un número como sospechoso. Body: `{ "numero": "3001234567", "categoria": "whatsapp_otp" }` |
+| `GET /reputacion/:numero` | Reputación agregada: total de reportes, reportantes distintos, si supera el umbral de "sospechoso" (3 reportantes distintos) |
+| `GET /reportes/:numero/denuncia` | Paquete de denuncia listo para copiar: resumen formateado (categorías, fechas, conteo) para adjuntar en A Denunciar/SPOA. Devuelve 409 si el número no llega al umbral de "sospechoso" todavía |
+| `GET /salud` | Health check |
 
-### 3. Pull a local model (on host)
+Categorías válidas: `whatsapp_otp`, `suplantacion_banco`, `suplantacion_entidad`, `llamada_spam`, `otro`.
 
-```bash
-ollama pull llama3.2
-```
+Protecciones: rate limiting (10 solicitudes / 15 min por IP, vía función Postgres `verificar_limite_ip`), un solo reporte por IP+número, umbral mínimo de reportantes distintos antes de marcar un número como sospechoso. La tabla `reportes` no permite `DELETE` desde el cliente (ni el propio backend) — así nadie puede borrar reportes hechos sobre su propio número.
 
-### 4. Launch
+Tests: `npm test` (test runner nativo de Node, sin dependencias nuevas) — son de integración real contra el proyecto Supabase de desarrollo, requieren `SUPABASE_URL`/`SUPABASE_ANON_KEY` en el entorno.
 
-```bash
-docker compose up -d --build
-```
+## App Android (compila, falta probar en dispositivo real)
 
-### 5. Access
+Detecta el momento exacto de riesgo: llamada activa + SMS con código OTP llegando al mismo tiempo → alerta a pantalla completa. El contenido de llamadas y SMS nunca sale del dispositivo. El número telefónico sí viaja al backend en dos casos: automáticamente en cada llamada entrante (para consultar reputación y poder bloquear antes de que timbre) y cuando el usuario reporta un número manualmente — ver el detalle en `docs/legal-privacidad-colombia.md`.
 
-| Service | URL |
-|---------|-----|
-| Odysseus AI | http://localhost:7000 |
-| n8n Automation | http://localhost:5678 |
-| SearXNG | http://localhost:8080 |
-| ChromaDB | http://localhost:8100 |
-| ntfy | http://localhost:8091 |
+`./gradlew assembleDebug` compila limpio (0 errores, 0 warnings). Ver `app-android/README.md` para cómo compilarlo y qué falta antes de correrlo en un teléfono real.
 
-## Data Persistence
+## Estructura
 
-All data is stored in named Docker volumes:
-
-```
-odysseus-data    → AI workspace data and SQLite DB
-odysseus-logs    → Application logs
-n8n-data         → Workflow definitions and credentials
-chromadb-data    → Vector embeddings
-searxng-data     → SearXNG configuration
-ntfy-cache       → Notification cache
-```
-
-## Stop & Reset
-
-```bash
-# Stop services
-docker compose down
-
-# Stop and remove all data (destructive)
-docker compose down -v
-```
-
-## Use Cases
-
-- **Business Intelligence** — Query local documents with RAG via Odysseus
-- **Workflow Automation** — Connect APIs and automate tasks with n8n
-- **Private Search** — Search the web without tracking via SearXNG
-- **AI Agents** — Run local LLMs through Ollama for offline inference
-
-## Contributing
-
-PRs welcome. Open an issue first to discuss major changes.
-
-## License
-
-MIT
+| Carpeta | Qué es |
+|---|---|
+| `docs/guia-anti-estafas.md` | Guía para compartir por WhatsApp: cómo reconocer el engaño y blindarse |
+| `docs/legal-privacidad-colombia.md` | Marco legal (Ley 1581, Ley 1273), por qué el diseño es privacy-first, checklist antes de distribución pública |
+| `docs/restricciones-tecnicas.md` | Lista verificable de lo que la app NUNCA hace, mapeada contra el AndroidManifest.xml real |
+| `docs/patrones-psicologicos-colombia.md` | Los 6 principios de persuasión aplicados a estafas colombianas (DIAN, Fiscalía, empleo falso), investigación sobre por qué la educación no protege, frases gatillo para futuras fases de detección |
+| `docs/canales-reporte-operadoras.md` | Qué canales de reporte a operadoras/SIC tienen efecto real vs cuáles no — sin prometer bloqueos que las operadoras no hacen |
+| `docs/palanca-regulatoria.md` | Ley 2573 de 2026 (verificación biométrica de SIM, vigente desde noviembre 2026) y dónde aporta realmente este proyecto: vigilancia de cumplimiento, no pedir una ley que ya existe |
+| `docs/declaracion-permisos-play-store.md` | Qué exige Google Play para RECEIVE_SMS bajo la excepción de detección de spam, y el riesgo real de que la aprobación no esté garantizada |
+| `docs/protocolo-desarrollo-marco-etico.docx` | Protocolo formal (Word) con marco ético, legal, arquitectura y metodología de validación — preparado para revisión de un comité de ética institucional |
+| `backend/` | API de reportes comunitarios (Node + Express + SQLite) |
+| `app-android/` | App Kotlin: detección de llamada+OTP, screening de llamadas, overlay de alerta |

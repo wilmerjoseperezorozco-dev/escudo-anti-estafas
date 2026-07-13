@@ -1,34 +1,21 @@
-# Environment — NEVER commit secrets
-.env
-.env.local
-.env.*.local
+# Backend (Node)
+backend/node_modules/
+backend/datos/
+backend/*.db
+backend/.env
+backend/.vercel
 
-# Docker volumes data (if mounted locally)
-data/
-volumes/
-logs/
+# Android
+app-android/local.properties
+app-android/.gradle/
+app-android/.idea/
+app-android/*/build/
+app-android/*/*/build/
+app-android/keystore/
+app-android/app/keystore.properties
+*.apk
+*.aab
 
-# OS
+# General
 .DS_Store
-Thumbs.db
-desktop.ini
-
-# Editor
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# Node (if any scripts)
-node_modules/
-
-# Python
-__pycache__/
-*.pyc
-*.pyo
-.venv/
-venv/
-
-# Temp
-*.tmp
-*.bak
+*.log
