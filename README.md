@@ -57,5 +57,8 @@ Detecta el momento exacto de riesgo: llamada activa + SMS con código OTP llegan
 | `docs/declaracion-permisos-play-store.md` | Qué exige Google Play para RECEIVE_SMS bajo la excepción de detección de spam, y el riesgo real de que la aprobación no esté garantizada |
 | `docs/protocolo-desarrollo-marco-etico.docx` | Protocolo formal (Word) con marco ético, legal, arquitectura y metodología de validación — preparado para revisión de un comité de ética institucional |
 | `docs/analisis-brechas-produccion.md` | Qué falta para escalar y, si se decide, monetizar: monitoreo, auto-actualización, límites de los planes gratuitos, camino a Play Store, formalización empresarial |
+| `docs/politica-privacidad.md` | Política de privacidad completa, mapeada a los requisitos de Google Play (Data Safety) y Apple (App Privacy) |
+| `docs/ficha-tienda.md` | Título, descripciones y palabras clave listos para Play Console, más el estado real de cada asset visual (ícono, gráfico de funciones, capturas) |
+| `store-assets/` | Ícono rediseñado, gráfico de funciones (HTML/SVG) y capturas reales para la ficha de tienda |
 | `backend/` | API de reportes comunitarios (Node + Express + Supabase Postgres, desplegado en Vercel) |
 | `app-android/` | App Kotlin: detección de llamada+OTP, screening de llamadas, overlay de alerta |

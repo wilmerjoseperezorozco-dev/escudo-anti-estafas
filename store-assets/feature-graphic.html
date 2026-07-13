@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  html, body { margin:0; padding:0; width:1024px; height:500px; overflow:hidden; }
+  .graphic {
+    width:1024px; height:500px;
+    background: linear-gradient(135deg, #1E88E5 0%, #0D47A1 100%);
+    position: relative;
+    font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    display:flex; align-items:center;
+  }
+  .shield {
+    position:absolute; left:60px; top:70px;
+  }
+  .text {
+    position:absolute; left:340px; top:0; right:60px; height:500px;
+    display:flex; flex-direction:column; justify-content:center;
+  }
+  .title {
+    color:#FFFFFF; font-size:56px; font-weight:800; line-height:1.1;
+    margin:0 0 18px 0; letter-spacing:-0.5px;
+  }
+  .subtitle {
+    color:#E3F2FD; font-size:26px; font-weight:400; line-height:1.4;
+    max-width:560px;
+  }
+  .badge {
+    display:inline-block; margin-top:28px; background:rgba(255,255,255,0.14);
+    color:#FFFFFF; font-size:18px; font-weight:600; padding:10px 20px;
+    border-radius:999px; width:fit-content;
+  }
+</style>
+</head>
+<body>
+  <div class="graphic">
+    <svg class="shield" width="360" height="360" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg">
+      <path fill="#FFFFFF" d="M54,23 C46,23 33,29 32,31 C31,32.5 31,34 31,36 L31,55 C31,73.5 40,85.5 54,91 C68,85.5 77,73.5 77,55 L77,36 C77,34 77,32.5 76,31 C75,29 62,23 54,23 Z"/>
+      <path fill="#0D47A1" opacity="0.12" d="M54,27 C48,27 37,32 36,33.5 C35.3,34.5 35,35.5 35,36.5 L35,55 C35,71 42.5,81.5 54,86.5 L54,27 Z"/>
+      <path fill="#1976D2" d="M45,58l-9,-9l5,-5l4,4l17,-17l5,5l-22,22z"/>
+    </svg>
+    <div class="text">
+      <div class="title">Escudo<br>Anti-Estafas</div>
+      <div class="subtitle">Detecta en tiempo real el robo de tu código de WhatsApp — antes de que sea tarde.</div>
+      <div class="badge">100% del análisis en tu teléfono</div>
+    </div>
+  </div>
+</body>
+</html>
