@@ -56,5 +56,6 @@ Detecta el momento exacto de riesgo: llamada activa + SMS con código OTP llegan
 | `docs/palanca-regulatoria.md` | Ley 2573 de 2026 (verificación biométrica de SIM, vigente desde noviembre 2026) y dónde aporta realmente este proyecto: vigilancia de cumplimiento, no pedir una ley que ya existe |
 | `docs/declaracion-permisos-play-store.md` | Qué exige Google Play para RECEIVE_SMS bajo la excepción de detección de spam, y el riesgo real de que la aprobación no esté garantizada |
 | `docs/protocolo-desarrollo-marco-etico.docx` | Protocolo formal (Word) con marco ético, legal, arquitectura y metodología de validación — preparado para revisión de un comité de ética institucional |
+| `docs/analisis-brechas-produccion.md` | Qué falta para escalar y, si se decide, monetizar: monitoreo, auto-actualización, límites de los planes gratuitos, camino a Play Store, formalización empresarial |
 | `backend/` | API de reportes comunitarios (Node + Express + Supabase Postgres, desplegado en Vercel) |
 | `app-android/` | App Kotlin: detección de llamada+OTP, screening de llamadas, overlay de alerta |
