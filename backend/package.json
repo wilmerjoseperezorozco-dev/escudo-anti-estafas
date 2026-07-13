@@ -2,10 +2,10 @@
   "name": "escudo-anti-estafas-backend",
   "version": "1.0.0",
   "description": "Backend de reportes comunitarios de números de estafa",
-  "main": "src/server.js",
+  "main": "api/index.js",
   "scripts": {
     "start": "node src/server.js",
-    "test": "node --test src/**/*.test.js"
+    "test": "node --test"
   },
   "keywords": [],
   "author": "",

@@ -1,6 +1,7 @@
 const express = require('express');
 const { crearClienteSupabase } = require('./db/supabase');
 const { crearRouterReportes } = require('./routes/reportes');
+const { paginaDescargaHtml } = require('./paginaDescarga');
 
 function crearApp() {
   const app = express();
@@ -15,6 +16,13 @@ function crearApp() {
   app.set('trust proxy', 1);
 
   app.use(express.json({ limit: '10kb' }));
+
+  // "framework": null en vercel.json es obligatorio para que esta ruta
+  // funcione: sin eso, la detección automática de proyectos Express de
+  // Vercel toma el control de "/" e ignora el rewrite hacia api/index.js,
+  // causando FUNCTION_INVOCATION_FAILED (intenta invocar src/server.js
+  // directamente, que exporta { crearApp } y no un handler).
+  app.get('/', (_req, res) => res.type('html').send(paginaDescargaHtml));
 
   app.use(crearRouterReportes(supabase));
 

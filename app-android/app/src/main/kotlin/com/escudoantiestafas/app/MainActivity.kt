@@ -11,8 +11,11 @@ import android.provider.Settings
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.escudoantiestafas.app.call.MonitoringService
+import com.escudoantiestafas.app.data.VersionApi
 import com.escudoantiestafas.app.databinding.ActivityMainBinding
+import kotlinx.coroutines.launch
 
 /**
  * Onboarding: explica qué hace la app (todo el análisis es local al
@@ -63,6 +66,25 @@ class MainActivity : AppCompatActivity() {
 
         if (todosLosPermisosConcedidos()) {
             binding.textoEstado.text = getString(R.string.onboarding_activo)
+        }
+
+        verificarActualizacionDisponible()
+    }
+
+    /**
+     * La app se distribuye por APK directo (sin Play Store todavía), así
+     * que no hay auto-actualización del sistema operativo — este chequeo
+     * es lo que la reemplaza mientras tanto. No bloquea nada si falla.
+     */
+    private fun verificarActualizacionDisponible() {
+        lifecycleScope.launch {
+            val version = VersionApi.hayVersionMasReciente() ?: return@launch
+
+            binding.textoActualizacion.text = getString(R.string.actualizacion_disponible, version.etiqueta)
+            binding.tarjetaActualizacion.visibility = android.view.View.VISIBLE
+            binding.botonActualizar.setOnClickListener {
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(version.urlDescarga)))
+            }
         }
     }
 

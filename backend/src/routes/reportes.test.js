@@ -1,7 +1,12 @@
-// Estos tests son de integración real: requieren SUPABASE_URL y
-// SUPABASE_ANON_KEY en el entorno, apuntando al proyecto de desarrollo
-// (nunca a uno con datos reales de usuarios). Usan números de prueba con
-// prefijo fijo (3001110xxx) para poder identificarlos después.
+// Estos tests son de integración real contra Supabase. IMPORTANTE:
+// `db/supabase.js` usa el proyecto de PRODUCCIÓN como valor por defecto
+// (necesario para que `deploy_to_vercel` funcione sin variables de
+// entorno) — eso significa que, sin SUPABASE_URL explícito, estos tests
+// escribirían datos de prueba en la base de datos real de usuarios. Por
+// eso se saltan automáticamente a menos que SUPABASE_URL esté fijado
+// explícitamente en el entorno (apuntando a un proyecto de desarrollo,
+// nunca a producción). Usan números de prueba con prefijo fijo
+// (3001110xxx) para poder identificarlos después.
 //
 // Nota importante: la política RLS de `reportes` NO permite DELETE desde
 // el cliente anon a propósito — así un estafador no puede borrar sus
@@ -15,16 +20,23 @@ const assert = require('node:assert/strict');
 const { crearApp } = require('../server');
 
 const NUMEROS_DE_PRUEBA = ['3001110001', '3001110002', '3001110003'];
+const SALTAR = !process.env.SUPABASE_URL;
+
+if (SALTAR) {
+  test('tests de integración de reportes omitidos: define SUPABASE_URL (proyecto de desarrollo) para correrlos', () => {});
+}
 
 let servidor;
 let baseUrl;
 
 before(() => {
+  if (SALTAR) return;
   servidor = crearApp().listen(0);
   baseUrl = `http://localhost:${servidor.address().port}`;
 });
 
 after(() => {
+  if (SALTAR) return;
   servidor.close();
 });
 
@@ -36,7 +48,7 @@ async function reportar(numero, categoria, ip) {
   });
 }
 
-test('GET /reportes/:numero/denuncia rechaza con menos de 3 reportantes distintos', async () => {
+test('GET /reportes/:numero/denuncia rechaza con menos de 3 reportantes distintos', { skip: SALTAR }, async () => {
   const numero = NUMEROS_DE_PRUEBA[0];
   await reportar(numero, 'llamada_spam', '10.1.0.1');
 
@@ -48,7 +60,7 @@ test('GET /reportes/:numero/denuncia rechaza con menos de 3 reportantes distinto
   assert.equal(cuerpo.reportantes_distintos, 1);
 });
 
-test('GET /reportes/:numero/denuncia genera el documento con 3+ reportantes distintos', async () => {
+test('GET /reportes/:numero/denuncia genera el documento con 3+ reportantes distintos', { skip: SALTAR }, async () => {
   const numero = NUMEROS_DE_PRUEBA[1];
 
   await reportar(numero, 'whatsapp_otp', '10.2.0.1');
@@ -68,12 +80,12 @@ test('GET /reportes/:numero/denuncia genera el documento con 3+ reportantes dist
   assert.match(cuerpo.documento_texto, new RegExp(numero));
 });
 
-test('GET /reportes/:numero/denuncia rechaza número inválido', async () => {
+test('GET /reportes/:numero/denuncia rechaza número inválido', { skip: SALTAR }, async () => {
   const res = await fetch(`${baseUrl}/reportes/123/denuncia`);
   assert.equal(res.status, 400);
 });
 
-test('POST /reportes rechaza el mismo IP reportando dos veces el mismo número', async () => {
+test('POST /reportes rechaza el mismo IP reportando dos veces el mismo número', { skip: SALTAR }, async () => {
   const numero = NUMEROS_DE_PRUEBA[2];
   await reportar(numero, 'otro', '10.3.0.1');
   const res = await reportar(numero, 'otro', '10.3.0.1');
