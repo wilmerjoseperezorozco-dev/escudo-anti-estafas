@@ -2,6 +2,7 @@ package com.escudoantiestafas.app.core
 
 import android.util.Log
 import java.util.concurrent.atomic.AtomicLong
+import java.util.concurrent.atomic.AtomicReference
 
 /**
  * Correlaciona dos señales que por separado son normales pero juntas son
@@ -16,9 +17,14 @@ object RiskCorrelator {
     private val ultimaLlamadaActivaEnMs = AtomicLong(0)
     private val ultimoOtpRecibidoEnMs = AtomicLong(0)
 
-    private var listener: (() -> Unit)? = null
+    // El número viene de CallScreeningServiceImpl (que sí lo recibe del
+    // sistema), no de la señal de "llamada activa" en sí — esta llega vía
+    // PhoneStateReceiver, que por diseño no expone el número entrante.
+    private val numeroLlamadaActual = AtomicReference<String?>(null)
 
-    fun establecerListenerDeAlerta(callback: () -> Unit) {
+    private var listener: ((String?) -> Unit)? = null
+
+    fun establecerListenerDeAlerta(callback: (String?) -> Unit) {
         listener = callback
     }
 
@@ -26,7 +32,13 @@ object RiskCorrelator {
     fun resetParaPruebas() {
         ultimaLlamadaActivaEnMs.set(0)
         ultimoOtpRecibidoEnMs.set(0)
+        numeroLlamadaActual.set(null)
         listener = null
+    }
+
+    /** Se llama desde CallScreeningServiceImpl.onScreenCall en cuanto entra la llamada. */
+    fun registrarNumeroLlamada(numero: String?) {
+        numeroLlamadaActual.set(numero)
     }
 
     fun onLlamadaActiva(ahoraMs: Long = System.currentTimeMillis()) {
@@ -56,7 +68,8 @@ object RiskCorrelator {
             // Evita reactivar la alerta repetidamente por el mismo par de eventos.
             ultimaLlamadaActivaEnMs.set(0)
             ultimoOtpRecibidoEnMs.set(0)
-            listener?.invoke()
+            val numero = numeroLlamadaActual.getAndSet(null)
+            listener?.invoke(numero)
         }
     }
 }

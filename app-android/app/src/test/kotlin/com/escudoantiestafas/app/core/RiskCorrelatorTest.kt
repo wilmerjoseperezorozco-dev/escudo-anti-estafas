@@ -125,4 +125,43 @@ class RiskCorrelatorTest {
         RiskCorrelator.onCodigoOtpRecibido(2_000L)
         assertTrue(true) // llegar aquí sin excepción es la prueba
     }
+
+    @Test
+    fun `el numero registrado por CallScreeningService llega al listener al disparar`() {
+        var numeroRecibido: String? = null
+        RiskCorrelator.establecerListenerDeAlerta { numero -> numeroRecibido = numero }
+
+        RiskCorrelator.registrarNumeroLlamada("3001234567")
+        RiskCorrelator.onLlamadaActiva(1_000L)
+        RiskCorrelator.onCodigoOtpRecibido(2_000L)
+
+        assertEquals("3001234567", numeroRecibido)
+    }
+
+    @Test
+    fun `el listener recibe null si nunca se registro un numero`() {
+        var numeroRecibido: String? = "valor_inicial_no_nulo"
+        RiskCorrelator.establecerListenerDeAlerta { numero -> numeroRecibido = numero }
+
+        RiskCorrelator.onLlamadaActiva(1_000L)
+        RiskCorrelator.onCodigoOtpRecibido(2_000L)
+
+        assertEquals(null, numeroRecibido)
+    }
+
+    @Test
+    fun `el numero se limpia despues de disparar y no se reusa en una alerta posterior`() {
+        val numerosRecibidos = mutableListOf<String?>()
+        RiskCorrelator.establecerListenerDeAlerta { numero -> numerosRecibidos.add(numero) }
+
+        RiskCorrelator.registrarNumeroLlamada("3001234567")
+        RiskCorrelator.onLlamadaActiva(1_000L)
+        RiskCorrelator.onCodigoOtpRecibido(2_000L)
+
+        // Segunda alerta, sin un número nuevo registrado — no debe arrastrar el anterior.
+        RiskCorrelator.onLlamadaActiva(500_000L)
+        RiskCorrelator.onCodigoOtpRecibido(510_000L)
+
+        assertEquals(listOf("3001234567", null), numerosRecibidos)
+    }
 }

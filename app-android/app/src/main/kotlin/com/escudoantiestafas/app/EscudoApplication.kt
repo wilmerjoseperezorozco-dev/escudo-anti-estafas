@@ -9,8 +9,8 @@ class EscudoApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        RiskCorrelator.establecerListenerDeAlerta {
-            AlertNotifier.dispararAlerta(applicationContext)
+        RiskCorrelator.establecerListenerDeAlerta { numero ->
+            AlertNotifier.dispararAlerta(applicationContext, numero)
         }
         ReintentoReportesWorker.programar(applicationContext)
     }

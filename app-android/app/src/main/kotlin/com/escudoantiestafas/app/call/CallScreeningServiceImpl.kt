@@ -2,6 +2,7 @@ package com.escudoantiestafas.app.call
 
 import android.telecom.Call
 import android.telecom.CallScreeningService
+import com.escudoantiestafas.app.core.RiskCorrelator
 import com.escudoantiestafas.app.data.ReputacionApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -26,6 +27,12 @@ class CallScreeningServiceImpl : CallScreeningService() {
             responderPermitiendoLlamada(callDetails)
             return
         }
+
+        // Se registra aquí porque este es el único punto del sistema donde
+        // la app recibe el número de la llamada entrante — RiskCorrelator
+        // lo necesita para poder ofrecer "reportar este número" si la
+        // llamada termina disparando la alerta de riesgo (ver AlertActivity).
+        RiskCorrelator.registrarNumeroLlamada(numero)
 
         // onScreenCall no puede suspenderse; se lanza una corrutina de vida
         // corta y se responde en cuanto se tiene la reputación o al vencer

@@ -45,6 +45,18 @@
             android:layout_height="wrap_content"
             android:text="@string/alerta_boton_entendido" />
 
+        <!-- Secundario a propósito: la prioridad es colgar, no reportar.
+             Solo visible cuando se pudo resolver el número (ver AlertActivity). -->
+        <Button
+            android:id="@+id/botonReportar"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:textColor="#FFFFFF"
+            android:text="@string/alerta_boton_reportar"
+            android:visibility="gone" />
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -20,13 +20,14 @@ object AlertNotifier {
     private const val CANAL_ID = "alerta_riesgo"
     private const val NOTIFICATION_ID = 2001
 
-    fun dispararAlerta(context: Context) {
+    fun dispararAlerta(context: Context, numero: String? = null) {
         crearCanalSiNecesario(context)
 
         val intent = Intent(context, AlertActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or
                 Intent.FLAG_ACTIVITY_CLEAR_TOP or
                 Intent.FLAG_ACTIVITY_SINGLE_TOP
+            putExtra(AlertActivity.EXTRA_NUMERO, numero)
         }
 
         val pendingIntent = PendingIntent.getActivity(

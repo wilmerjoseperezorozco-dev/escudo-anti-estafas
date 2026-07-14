@@ -17,4 +17,7 @@
     <string name="alerta_titulo">⚠ NO COMPARTAS EL CÓDIGO</string>
     <string name="alerta_cuerpo">Recibiste un código de verificación mientras estás en una llamada. Ni tu banco ni WhatsApp lo piden por teléfono. Cuelga ahora.</string>
     <string name="alerta_boton_entendido">Entendido, voy a colgar</string>
+    <string name="alerta_boton_reportar">Reportar este número</string>
+    <string name="alerta_reportando">Reportando…</string>
+    <string name="alerta_reportado">Reportado. Gracias por ayudar a la comunidad.</string>
 </resources>
