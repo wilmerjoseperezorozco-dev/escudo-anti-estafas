@@ -59,6 +59,8 @@ Detecta el momento exacto de riesgo: llamada activa + SMS con código OTP llegan
 | `docs/analisis-brechas-produccion.md` | Qué falta para escalar y, si se decide, monetizar: monitoreo, auto-actualización, límites de los planes gratuitos, camino a Play Store, formalización empresarial |
 | `docs/politica-privacidad.md` | Política de privacidad completa, mapeada a los requisitos de Google Play (Data Safety) y Apple (App Privacy) |
 | `docs/ficha-tienda.md` | Título, descripciones y palabras clave listos para Play Console, más el estado real de cada asset visual (ícono, gráfico de funciones, capturas) |
+| `docs/formulario-play-console.md` | Texto exacto, listo para copiar y pegar, para el Formulario de Declaración de Permisos y la sección Data Safety de Play Console |
+| `docs/ficha-institucional-escudo-anti-estafas.docx` | Documento profesional (Word) para presentar el proyecto a instituciones: Policía Nacional, Fiscalía, operadoras, SIC |
 | `store-assets/` | Ícono rediseñado, gráfico de funciones (HTML/SVG) y capturas reales para la ficha de tienda |
 | `backend/` | API de reportes comunitarios (Node + Express + Supabase Postgres, desplegado en Vercel) |
 | `app-android/` | App Kotlin: detección de llamada+OTP, screening de llamadas, overlay de alerta |
