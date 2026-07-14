@@ -7,6 +7,7 @@ import androidx.lifecycle.lifecycleScope
 import com.escudoantiestafas.app.R
 import com.escudoantiestafas.app.data.ColaDeReportesSqlite
 import com.escudoantiestafas.app.data.ReporteRepository
+import com.escudoantiestafas.app.data.TelemetriaApi
 import com.escudoantiestafas.app.databinding.ActivityAlertBinding
 import kotlinx.coroutines.launch
 
@@ -29,6 +30,10 @@ class AlertActivity : AppCompatActivity() {
 
         binding.botonEntendido.setOnClickListener { finish() }
         configurarBotonReportar()
+
+        // Conteo anónimo de que la protección funcionó de verdad — ver
+        // TelemetriaApi y la política de privacidad, sección 2.
+        lifecycleScope.launch { TelemetriaApi.registrarDeteccion() }
     }
 
     /**

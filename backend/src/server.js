@@ -1,7 +1,9 @@
 const express = require('express');
 const { crearClienteSupabase } = require('./db/supabase');
 const { crearRouterReportes } = require('./routes/reportes');
+const { crearRouterEstadisticas } = require('./routes/estadisticas');
 const { paginaDescargaHtml } = require('./paginaDescarga');
+const { paginaPrivacidadHtml } = require('./paginaPrivacidad');
 
 function crearApp() {
   const app = express();
@@ -23,8 +25,10 @@ function crearApp() {
   // causando FUNCTION_INVOCATION_FAILED (intenta invocar src/server.js
   // directamente, que exporta { crearApp } y no un handler).
   app.get('/', (_req, res) => res.type('html').send(paginaDescargaHtml));
+  app.get('/privacidad', (_req, res) => res.type('html').send(paginaPrivacidadHtml));
 
   app.use(crearRouterReportes(supabase));
+  app.use(crearRouterEstadisticas(supabase));
 
   app.get('/salud', (_req, res) => res.json({ ok: true }));
 

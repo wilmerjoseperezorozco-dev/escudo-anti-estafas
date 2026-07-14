@@ -1,6 +1,6 @@
 # Política de privacidad — Escudo Anti-Estafas
 
-**Última actualización: 13 de julio de 2026.**
+**Última actualización: 14 de julio de 2026.**
 Aplica a la aplicación Android "Escudo Anti-Estafas" (`com.escudoantiestafas.app`) y a su backend en `https://escudo-anti-estafas.vercel.app`. Responsable del tratamiento: Wilmer José Pérez Orozco, Barranquilla, Colombia. Contacto: **wilmerjoseperezorozco@gmail.com**.
 
 > Este documento está redactado para cumplir con lo que exige la sección "Data Safety" de Google Play y, de forma anticipada, con el estándar de "App Privacy" (nutrition label) de Apple — aunque hoy la app es exclusivamente Android (ver la nota en la sección 9). También sigue los lineamientos de la Ley 1581 de 2012 de Colombia (Habeas Data). No reemplaza asesoría legal formal antes de una distribución masiva; ver `docs/legal-privacidad-colombia.md` para el detalle de esa recomendación.
@@ -16,6 +16,9 @@ Escudo Anti-Estafas analiza, **únicamente dentro de tu teléfono**, si una llam
 | Número de teléfono de una llamada entrante | Del **llamante** (puede ser un tercero, no necesariamente tú) | Automáticamente, en cada llamada entrante, para consultar si ese número ya fue reportado por la comunidad (`GET /reputacion/:numero`) |
 | Número de teléfono que decides reportar | Del número que tú reportas manualmente | Solo cuando tocas explícitamente "Reportar este número" (`POST /reportes`) |
 | Dirección IP de tu conexión | Tuya | Automáticamente en cada solicitud al servidor — es un dato técnico estándar de cualquier petición web, usado solo para limitar abusos (ver sección 4) |
+| Un conteo anónimo de que la app detectó el patrón de riesgo | Nadie en particular — es un evento, no un dato personal | Cada vez que la correlación llamada+OTP dispara la alerta, se envía un registro sin número de teléfono, sin dirección IP asociada al evento y sin ningún identificador de dispositivo o de usuario |
+
+Sobre el conteo anónimo de detecciones: existe para poder demostrar, con evidencia real y pública, qué tan efectiva es la protección — cuántas veces la app detectó de verdad el patrón de un intento de robo de código. No se puede usar para identificarte ni para reconstruir qué le pasó a un usuario específico, porque no guarda absolutamente nada que te vincule al evento — ni siquiera tu IP, a diferencia de las demás solicitudes al servidor.
 
 Sobre el número del llamante: es un dato personal de un tercero que no dio consentimiento directo a esta app. Lo tratamos bajo la misma base que usan apps de identificación de llamadas/spam (Truecaller y similares): interés legítimo en la prevención de fraude, limitado estrictamente al número — nunca se asocia a nombre, foto, ni ningún otro dato de esa persona, porque la app no accede a esa información en primer lugar.
 
@@ -88,7 +91,7 @@ Hoy Escudo Anti-Estafas es una aplicación **exclusivamente Android** — la det
 | Contactos | No | No | — |
 | Información financiera | No | No | — |
 | Fotos/video/audio | No | No | — |
-| Actividad en la app / analítica | No | No | — |
+| Actividad en la app / analítica | Sí, pero anónimo (solo un conteo de detecciones, sin identificador) | No | Medir la efectividad real de la protección |
 | Registros de diagnóstico (IP, técnico) | Sí (solo IP, automático) | No | Prevención de abuso / seguridad |
 
 Todos los datos declarados como "recolectados" viajan cifrados en tránsito. No se ofrece mecanismo de borrado de cuenta porque no existe cuenta; el borrado de un reporte específico se solicita por contacto directo (sección 7).

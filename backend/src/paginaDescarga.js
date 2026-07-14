@@ -3,8 +3,7 @@ const URL_DESCARGA_APK =
 const URL_RELEASES =
   'https://github.com/wilmerjoseperezorozco-dev/escudo-anti-estafas/releases';
 const URL_REPO = 'https://github.com/wilmerjoseperezorozco-dev/escudo-anti-estafas';
-const URL_PRIVACIDAD =
-  'https://github.com/wilmerjoseperezorozco-dev/escudo-anti-estafas/blob/main/docs/politica-privacidad.md';
+const URL_PRIVACIDAD = '/privacidad';
 
 /**
  * Landing pública de descarga, servida directamente por el backend en "/".
@@ -91,6 +90,13 @@ const paginaDescargaHtml = `<!doctype html>
 
   section { padding: 48px 0; }
   section.gris { background: #F7F9FC; }
+
+  .estadisticas { background: var(--azul-fondo); padding: 28px 0; }
+  .estadisticas-grid {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 32px; text-align: center;
+  }
+  .estadisticas-grid strong { display: block; font-size: 28px; font-weight: 800; color: var(--azul-oscuro); }
+  .estadisticas-grid span { font-size: 14px; color: var(--texto-suave); }
 
   .historia {
     background: var(--ambar-fondo);
@@ -205,6 +211,15 @@ const paginaDescargaHtml = `<!doctype html>
   </div>
 </header>
 
+<section id="franjaEstadisticas" class="estadisticas" style="display:none;">
+  <div class="envoltorio">
+    <div class="estadisticas-grid">
+      <div><strong id="estatDetecciones">—</strong><span>alertas reales disparadas</span></div>
+      <div><strong id="estatReportes">—</strong><span>números reportados por la comunidad</span></div>
+    </div>
+  </div>
+</section>
+
 <section>
   <div class="envoltorio">
     <div class="historia">
@@ -298,6 +313,20 @@ const paginaDescargaHtml = `<!doctype html>
   Contacto: <a href="mailto:wilmerjoseperezorozco@gmail.com">wilmerjoseperezorozco@gmail.com</a> ·
   <a href="${URL_REPO}">GitHub</a>
 </footer>
+
+<script>
+  // Solo se muestra la franja si ya hay algo real que mostrar — nada de
+  // "0 alertas disparadas" el primer día, eso no genera confianza, genera dudas.
+  fetch('/estadisticas').then(function (r) { return r.json(); }).then(function (datos) {
+    var detecciones = datos.detecciones_totales || 0;
+    var reportes = datos.numeros_reportados || 0;
+    if (detecciones + reportes === 0) return;
+
+    document.getElementById('estatDetecciones').textContent = detecciones.toLocaleString('es-CO');
+    document.getElementById('estatReportes').textContent = reportes.toLocaleString('es-CO');
+    document.getElementById('franjaEstadisticas').style.display = 'block';
+  }).catch(function () {});
+</script>
 
 </body>
 </html>

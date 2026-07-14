@@ -1,5 +1,6 @@
 const express = require('express');
 const { esNumeroValido, normalizarNumero } = require('../numero');
+const { crearLimitarPorIp } = require('../middleware/limitarPorIp');
 
 const CATEGORIAS_VALIDAS = new Set([
   'whatsapp_otp',
@@ -81,28 +82,7 @@ async function resumirReportes(supabase, numero) {
 
 function crearRouterReportes(supabase) {
   const router = express.Router();
-
-  async function limitarPorIp(req, res, next) {
-    try {
-      const { data: permitido, error } = await supabase.rpc('verificar_limite_ip', {
-        ip_cliente: req.ip,
-      });
-
-      if (error) throw error;
-
-      if (!permitido) {
-        return res.status(429).json({
-          error: 'demasiadas_solicitudes',
-          mensaje: 'Intenta de nuevo más tarde.',
-        });
-      }
-
-      next();
-    } catch (error) {
-      console.error('Fallo el chequeo de rate limiting:', error);
-      res.status(500).json({ error: 'error_interno' });
-    }
-  }
+  const limitarPorIp = crearLimitarPorIp(supabase);
 
   router.use('/reportes', limitarPorIp);
 
