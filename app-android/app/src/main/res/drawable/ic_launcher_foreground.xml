@@ -1,0 +1,23 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Escudo: contorno suave con hombros redondeados y punta inferior,
+         centrado en la zona segura del ícono adaptativo (círculo de 66dp). -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,23 C46,23 33,29 32,31 C31,32.5 31,34 31,36 L31,55 C31,73.5 40,85.5 54,91 C68,85.5 77,73.5 77,55 L77,36 C77,34 77,32.5 76,31 C75,29 62,23 54,23 Z" />
+    <!-- Sombra sutil interior para dar profundidad sin perder legibilidad
+         a tamaño pequeño (48dp en el launcher). -->
+    <path
+        android:fillColor="#0D47A1"
+        android:fillAlpha="0.12"
+        android:pathData="M54,27 C48,27 37,32 36,33.5 C35.3,34.5 35,35.5 35,36.5 L35,55 C35,71 42.5,81.5 54,86.5 C54,86.5 54,86.5 54,86.5 L54,27 Z" />
+    <!-- Marca de verificación, más gruesa que la versión anterior para
+         que se lea con claridad a tamaño de ícono real. -->
+    <path
+        android:fillColor="#1976D2"
+        android:pathData="M45,58l-9,-9l5,-5l4,4l17,-17l5,5l-22,22z" />
+</vector>
